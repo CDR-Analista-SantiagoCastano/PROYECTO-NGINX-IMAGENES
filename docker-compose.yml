@@ -1,0 +1,19 @@
+services:
+  nginx-images:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nginx-images
+    restart: unless-stopped
+    volumes:
+      - ${IMAGES_PATH}:/srv/images:ro
+    ports:
+      - "8080:80"
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared-images
+    restart: unless-stopped
+    depends_on:
+      - nginx-images
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARED_TUNNEL_TOKEN}
